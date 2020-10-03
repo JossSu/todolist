@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>to do list</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <input type="text" v-model="inputValue" />
+    <button @click="handleBtnClick">Submit</button>
+    <ul>
+      <todo-item v-for="item, index in list" :content="item" :index="index" :key="index" @delete="handleItemDelete">
+      </todo-item>
+    </ul>
+  </div>
+  <script>
+    // 全局組件寫法
+    // Vue.component("TodoItem", {
+    //   props: ['content'],
+    //   template: "<li>{{content}}</li>"
+    // })
+
+    // 局部組件寫法
+    // 要在Vue加入components註冊局部組件
+    var TodoItem = {
+      // props裡接收index目的為傳遞是哪一個index來進行handleItemDelete
+      props: ['content', 'index'],
+      template: "<li @click='handleItemClick'>{{content}}</li>",
+      methods: {
+        handleItemClick: function () {
+          // 用$emit透過事件觸發向上層觸發事件來上傳事件
+          // 另設定this.index來傳index值給父主件
+          this.$emit("delete", this.index)
+        }
+      }
+    }
+
+    var app = new Vue({
+      el: '#app',
+      // 註冊局部組件
+      components: {
+        TodoItem: TodoItem
+      },
+      data: {
+        list: [],
+        inputValue: ''
+      },
+      methods: {
+        handleBtnClick: function () {
+          this.list.push(this.inputValue)
+          this.inputValue = ''
+        },
+        handleItemDelete: function (index) {
+          this.list.splice(index, 1)
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>
